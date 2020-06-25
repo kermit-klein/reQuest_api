@@ -5,9 +5,9 @@ class Api::RequestsController < ApplicationController
     category = params[:category] || 'all'
 
     requests = if category == 'all'
-                 Request.where(status: "pending").order('id DESC')
+                 Request.where(status: 'pending').order('id DESC')
                else
-                 Request.where(*request_params, status: "pending").order('id DESC')
+                 Request.where(*request_params, status: 'pending').order('id DESC')
                end
 
     render json: requests, each_serializer: Request::IndexSerializer, coordinates: check_coordinates
@@ -20,10 +20,12 @@ class Api::RequestsController < ApplicationController
   end
 
   def check_coordinates
+    params[:coordinates] = JSON.parse(params[:coordinates])
     ok = params[:coordinates] &&
          params[:coordinates][:lat] &&
          params[:coordinates][:long]
     return nil unless ok
+
     lat = params[:coordinates][:lat].to_f
     long = params[:coordinates][:long].to_f
     ok = lat >= -90 &&
